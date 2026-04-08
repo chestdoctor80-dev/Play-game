@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>معلومات عامة</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>معلومات عامة</h1>
+  <button id="startBtn">ابدأ</button>
+
+  <div id="modelSelector" style="display:none;">
+    <h2>اختر النموذج</h2>
+    <div id="models"></div>
+  </div>
+
+  <div id="quizContainer" style="display:none;"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+body {
+  background: linear-gradient(to bottom, #a678d8, #d8b7ff); /* بنفسجي فاتح بلمعة */
+  font-family: Tahoma, Arial, sans-serif;
+  text-align: center;
+  direction: rtl;
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1 {
+  margin-top: 20px;
+  font-size: clamp(20px, 4vw, 36px); /* متجاوب */
+  color: #fff;
+  font-weight: bold;
+}
+
+#startBtn {
+  background: #c2185b;
+  color: #fff;
+  font-size: clamp(18px, 3vw, 26px); /* متجاوب */
+  padding: clamp(12px, 3vw, 20px);
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  margin: 40px auto 60px auto;
+  font-weight: bold;
+}
+
+.modelBtn {
+  background: #4caf50;
+  color: #fff;
+  padding: clamp(10px, 2.5vw, 18px);
+  margin: 10px auto;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: clamp(16px, 2.5vw, 22px);
+  width: 90%;
+  max-width: 500px;
+  font-weight: bold;
+}
+
+.option {
+  display: block;
+  margin: 10px auto;
+  padding: clamp(10px, 2.5vw, 18px);
+  width: 90%;
+  max-width: 500px;
+  background: rgba(255,255,255,0.2);
+  border: 2px solid rgba(255,255,255,0.5);
+  border-radius: 6px;
+  cursor: pointer;
+  color: #000; /* النص باللون الأسود */
+  font-size: clamp(16px, 2.5vw, 22px);
+  font-weight: bold;
+}
+
+.option:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.question {
+  font-size: clamp(22px, 5vw, 40px); /* أكبر ومتجاوب */
+  font-weight: bold;
+  color: #000; /* السؤال باللون الأسود */
+  margin: 20px auto;
+  max-width: 90%;
+}
+
+.result {
+  font-size: clamp(18px, 3vw, 26px);
+  margin-top: 20px;
+  color: #fff;
+  font-weight: bold;
+}
+
+.correct {
+  color: #008000; /* أخضر غامق */
+  font-weight: bold;
+  font-size: clamp(20px, 4vw, 32px); /* أكبر ومتجاوب */
+}
+
+.wrong {
+  color: #b30000; /* أحمر غامق */
+  font-weight: bold;
+  font-size: clamp(20px, 4vw, 32px); /* أكبر ومتجاوب */
+}
+
+#models {
+  display: flex;
+  flex-direction: column; /* يجعل الأزرار رأسية */
+  align-items: center;    /* يوسّط الأزرار */
+}
+const models = [
+  [
+    {question:"من هو مكتشف قانون الجاذبية؟", options:["نيوتن","أينشتاين","غاليليو","كوبرنيكوس"], answer:0}, // علوم
+    {question:"ما هي عاصمة فرنسا؟", options:["مدريد","باريس","روما","برلين"], answer:1}, // جغرافيا
+    {question:"أكبر عضو في جسم الإنسان؟", options:["القلب","الكبد","الرئة","المعدة"], answer:1}, // علوم
+    {question:"من هو مؤلف رواية 1984؟", options:["جورج أورويل","تولستوي","دوستويفسكي","هيمنغواي"], answer:0}, // أدب
+    {question:"كم عدد قلوب الأخطبوط؟", options:["1","2","3","4"], answer:2}, // علوم
+    {question:"أول رئيس للولايات المتحدة؟", options:["لينكولن","واشنطن","روزفلت","أوباما"], answer:1}, // تاريخ
+    {question:"ما نتيجة 12 × 8؟", options:["96","108","88","86"], answer:0}, // رياضيات
+    {question:"من هو مؤلف مسرحية هاملت؟", options:["شكسبير","دانتي","هوميروس","فيرجيل"], answer:0}, // أدب
+    {question:"أول من اخترع الهاتف؟", options:["جراهام بيل","أديسون","تسلا","فاراداي"], answer:0}, // اختراعات
+    {question:"أطول نهر في العالم؟", options:["الأمازون","النيل","اليانغتسي","الدانوب"], answer:1} // جغرافيا
+  ],
+  [
+    {question:"عدد ألوان قوس قزح؟", options:["5","6","7","8"], answer:2}, // علوم
+    {question:"من هو مؤلف الكوميديا الإلهية؟", options:["دانتي","هوميروس","فيرجيل","شكسبير"], answer:0}, // أدب
+    {question:"أكبر قارة من حيث عدد السكان؟", options:["أفريقيا","آسيا","أوروبا","أمريكا"], answer:1}, // جغرافيا
+    {question:"أول من صعد إلى القمر؟", options:["نيل آرمسترونغ","يوري جاجارين","باز ألدرين","مايكل كولينز"], answer:0}, // تاريخ/علوم
+    {question:"أكبر دولة عربية من حيث المساحة؟", options:["السعودية","الجزائر","السودان","مصر"], answer:1}, // جغرافيا
+    {question:"من هو مكتشف الدورة الدموية؟", options:["ابن النفيس","ابن سينا","باستور","فليمنغ"], answer:0}, // علوم
+    {question:"ما نتيجة 15 ÷ 3؟", options:["3","4","5","6"], answer:2}, // رياضيات
+    {question:"من هو مؤلف الإلياذة؟", options:["هوميروس","فيرجيل","دانتي","شكسبير"], answer:0}, // أدب
+    {question:"أول من اخترع الطائرة؟", options:["الأخوان رايت","تسلا","أديسون","بيل"], answer:0}, // اختراعات
+    {question:"أكبر جبل في العالم؟", options:["إيفرست","كي2","مون بلان","ماكالو"], answer:0} // جغرافيا
+  ],
+  [
+    {question:"أول من وضع جدول العناصر الكيميائية؟", options:["مندليف","نيوتن","أينشتاين","فليمنغ"], answer:0}, // علوم
+    {question:"أول من اخترع المصباح الكهربائي؟", options:["أديسون","تسلا","بيل","فاراداي"], answer:0}, // اختراعات
+    {question:"ما هي عاصمة ألمانيا؟", options:["برلين","ميونخ","فرانكفورت","هامبورغ"], answer:0}, // جغرافيا
+    {question:"أول من اكتشف الذرة؟", options:["ديموقريطس","نيوتن","أينشتاين","غاليليو"], answer:0}, // علوم
+    {question:"من هو مؤلف رواية الحرب والسلام؟", options:["تولستوي","دوستويفسكي","أوسكار وايلد","شكسبير"], answer:0}, // أدب
+    {question:"أكبر دولة في أمريكا الجنوبية؟", options:["الأرجنتين","البرازيل","تشيلي","بيرو"], answer:1}, // جغرافيا
+    {question:"ما نتيجة 9 × 9؟", options:["81","72","99","90"], answer:0}, // رياضيات
+    {question:"أول من اخترع السيارة؟", options:["كارل بنز","فورد","تسلا","أديسون"], answer:0}, // اختراعات
+    {question:"أول من اخترع الكاميرا؟", options:["ابن الهيثم","أديسون","بيل","تسلا"], answer:0}, // اختراعات
+    {question:"أكبر دولة أوروبية؟", options:["فرنسا","ألمانيا","روسيا","إيطاليا"], answer:2} // جغرافيا
+  ],
+  [
+    {question:"ما هي عاصمة مصر؟", options:["الإسكندرية","القاهرة","الجيزة","الأقصر"], answer:1}, // جغرافيا
+    {question:"أكبر دولة في العالم الإسلامي؟", options:["إندونيسيا","السعودية","باكستان","تركيا"], answer:0}, // جغرافيا
+    {question:"من هو مؤلف الإلياذة؟", options:["هوميروس","فيرجيل","دانتي","شكسبير"], answer:0}, // أدب
+    {question:"أول من اخترع الطابعة؟", options:["غوتنبرغ","أديسون","بيل","تسلا"], answer:0}, // اختراعات
+    {question:"أول من اخترع التلفاز؟", options:["جون بيرد","أديسون","بيل","تسلا"], answer:0}, // اختراعات
+    {question:"من هو مكتشف البنسلين؟", options:["ألكسندر فليمنغ","لويس باستور","داروين","نيوتن"], answer:0}, // علوم
+    {question:"ما نتيجة 100 ÷ 25؟", options:["2","3","4","5"], answer:3}, // رياضيات
+    {question:"أول من اخترع الرادار؟", options:["واتسون وات","أديسون","بيل","تسلا"], answer:0}, // اختراعات
+    {question:"أول من اخترع الديناميت؟", options:["نوبل","تسلا","أديسون","بيل"], answer:0}, // اختراعات
+    {question:"أكبر دولة في أوروبا الشرقية؟", options:["بولندا","أوكرانيا","روسيا","رومانيا"], answer:2} // جغرافيا
+  ],
+  [
+    {question:"ما هي عاصمة السعودية؟", options:["الرياض","جدة","مكة","الدمام"], answer:0}, // جغرافيا
+    {question:"أكبر دولة في الخليج العربي؟", options:["الكويت","السعودية","الإمارات","قطر"], answer:1}, // جغرافيا
+    {question:"أول من اخترع الغواصة؟", options:["كورنيليوس فان دريبل","أديسون","بيل","تسلا"], answer:0}, // اختراعات
+    {question:"أول من اخترع الميكروسكوب؟", options:["زانسن","أديسون","بيل","تسلا"], answer:0}, // اختراعات
+    {question:"من هو مؤلف الكوميديا الإلهية؟", options:["دانتي","هوميروس","فيرجيل","شكسبير"], answer:0}, // أدب
+    {question:"من هو مكتشف الدورة الدموية؟", options:["ابن النفيس","ابن سينا","باستور","فليمنغ"], answer:0}, // علوم
+    {question:"ما نتيجة 7 × 12؟", options:["72","84","96","108"], answer:1}, // رياضيات
+    {question:"أول من اخترع المصعد؟", options:["إليشا أوتيس","أديسون","بيل","تسلا"], answer:0}, // اختراعات
+    {question:"أول من اخترع البطارية؟", options:["فولت","أديسون","بيل","تسلا"], answer:0}, // اختراعات
+    {question:"ما اسم الصحابي الذي جمع القرآن الكريم في مصحف واحد في عهد أبي بكر الصديق رضي الله عنه؟", options:["زيد بن ثابت","عبد الله بن مسعود","أبو هريرة","عثمان بن عفان"], answer:0} // سؤال إسلامي
+  ]
+];
+ 0;
+let currentQuestion = 0;
+let score = 0;
+let wrong = 0;
+
+document.getElementById("startBtn").addEventListener("click", showModels);
+
+function showModels() {
+  document.getElementById("startBtn").style.display = "none";
+  document.getElementById("modelSelector").style.display = "block";
+  let modelsDiv = document.getElementById("models");
+  modelsDiv.innerHTML = "";
+  for (let i = 0; i < models.length; i++) {
+    modelsDiv.innerHTML += `<button class="modelBtn" onclick="startQuiz(${i})">النموذج ${i+1}</button>`;
+  }
+}
+
+function startQuiz(modelIndex) {
+  currentModel = modelIndex;
+  currentQuestion = 0;
+  score = 0;
+  wrong = 0;
+  document.getElementById("modelSelector").style.display = "none";
+  document.getElementById("quizContainer").style.display = "block";
+  showQuestion();
+}
+
+function showQuestion() {
+  let quizContainer = document.getElementById("quizContainer");
+  let q = models[currentModel][currentQuestion];
+  quizContainer.innerHTML = `
+    <div class="question">${q.question}</div>
+    ${q.options.map((opt, i) => 
+      `<button class="option" onclick="checkAnswer(${i})">${i+1}. ${opt}</button>`
+    ).join("")}
+    <div id="feedback"></div>
+  `;
+}
+
+function checkAnswer(selected) {
+  let q = models[currentModel][currentQuestion];
+  let feedback = document.getElementById("feedback");
+  if (selected === q.answer) {
+    score++;
+    feedback.innerHTML = `<p class="correct">إجابة صحيحة!</p>`;
+  } else {
+    wrong++;
+    feedback.innerHTML = `<p class="wrong">إجابة خاطئة! الصحيح هو: ${q.options[q.answer]}</p>`;
+  }
+  setTimeout(() => {
+    currentQuestion++;
+    if (currentQuestion < models[currentModel].length) {
+      showQuestion();
+    } else {
+      document.getElementById("quizContainer").innerHTML = `
+        <h2>انتهى النموذج!</h2>
+        <p class="result">إجابات صحيحة: ${score}</p>
+        <p class="result">إجابات خاطئة: ${wrong}</p>
+        <button onclick="showModels()">اختر نموذج آخر</button>
+      `;
+    }
+  }, 1500);
+{
+  "name": "لعبة معلومات عامة",
+  "short_name": "معلومات",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#a678d8",
+  "theme_color": "#6a4caf",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}self.addEventListener("install", event => {
+  event.waitUntil(
+    caches.open("quiz-cache").then(cache => {
+      return cache.addAll([
+        "index.html",
+        "style.css",
+        "script.js",
+        "manifest.json"
+      ]);
+    })
+  );
+});
+
+self.addEventListener("fetch", event => {
+  event.respondWith(
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    })
+  );
+});
